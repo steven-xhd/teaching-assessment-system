@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tces.mapper.TbAssessResultMapperCustom">
+
+    <resultMap id="scoreResult" type="TbAssessResultVo">
+        <id property="id" column="id"/>
+        <result property="batchName" column="batchName"/>
+        <result property="lessonName" column="lessonName"/>
+        <result property="score" column="score"/>
+    </resultMap>
+
+    <select id="findScoreByUserId" resultMap="scoreResult" parameterType="Integer">
+      SELECT
+          tb_assess_result.id as id,
+          tb_batch.batch_name as batchName,
+          tb_lesson.lesson_name as lessonName,
+          tb_assess_result.score as score
+      FROM
+          tb_assess_result
+      JOIN tb_batch ON tb_assess_result.batch_id = tb_batch.id
+      JOIN tb_lesson ON tb_assess_result.lesson_id = tb_lesson.id
+      WHERE
+          tb_assess_result.user_id = #{userId}
+  </select>
+</mapper>

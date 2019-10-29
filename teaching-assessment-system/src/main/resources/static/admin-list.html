@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>学生管理</title>
+        <meta name="renderer" content="webkit">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
+                            <button class="layui-btn" onclick="xadmin.open('添加','./admin-add.html',600,400)"><i class="layui-icon"></i>添加</button>
+                            <div class="layui-inline layui-show-xs-block">
+                                <input id="content" type="text" name="content"  placeholder="请输入搜索项" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-card-body ">
+                            <table id="admin" class="layui-table layui-form">
+                                <thead>
+                              <tr>
+                                  <th>
+                                    <input lay-filter="checkall" type="checkbox" name=""  lay-skin="primary">
+                                  </th>
+                                  <th>序号</th>
+                                  <th class="id" style="display: none;">id</th>
+                                  <th class="classId" style="display: none;">classId</th>
+                                  <th class="roleId" style="display: none;">roleId</th>
+                                  <th class="status" style="display: none;">status</th>
+                                  <th>用户名</th>
+                                  <th>班级</th>
+                                  <th>院系</th>
+                                  <th>角色</th>
+                                  <th>修改状态</th>
+                                  <th>操作</th></tr>
+                              </thead>
+                              <tbody>
+                                <!--查询后台获取学生信息-->
+                              </tbody>
+                            </table>
+                        </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </body>
+    <script>
+      layui.use(['laydate','form','jquery','layer'], function(){
+        var laydate = layui.laydate;
+        var form = layui.form;
+        var layer = layui.layer
+        var $ =layui.$
+
+
+          //模糊查询
+          $('#content').on('input',function () {
+              $.ajax({
+                  url:"http://localhost:8080/user/findByNameLike",
+                  data:{"username":$(this).val()},
+                  success:function (res) {
+                      $('tbody').empty()
+                      console.log("模糊查询")
+                      var content1 = ""
+                      res.data.forEach(function(value,key) {
+                          if(value.status == 1){
+                              content1 = "禁用"
+                          }else{
+                              content1 = "启用"
+                          }
+                          var content = "<tr>\n" +
+                              "                                  <td>\n" +
+                              "                                    <input class='item' type='checkbox' value='"+parseInt(key+1)+"' lay-skin='primary'>\n" +
+                              "                                  </td>\n" +
+                              "                                  <td>"+parseInt(key+1)+"</td>\n" +
+                              "                                    <td class='id' style='display: none;'>"+value.id+"</td>\n" +
+                              "                                    <td class='classId' style='display: none;'>"+value.classId+"</td>\n" +
+                              "                                    <td class='roleId' style='display: none;'>"+value.roleId+"</td>\n" +
+                              "                                    <td class='status' style='display: none;'>"+value.status+"</td>" +
+                              "                                  <td class='username'>"+value.username+"</td>\n" +
+                              "                                  <td>"+value.className+"</td>\n" +
+                              "                                  <td>"+value.depName+"</td>\n" +
+                              "                                  <td>"+value.roleName+"</td>\n" +
+                              "                                  <td class='td-status'>\n" +
+                              "                                    <span class='layui-btn layui-btn-normal layui-btn-mini status'>"+content1+"</span></td>\n" +
+                              "                                 <td><button  class='layui-btn edit' onclick='xadmin.open('修改','./admin-edit.html',600,400)'><i class='layui-icon'>&#xe642;</i>修改</button></td>" +
+                              "</tr>"
+                          $('tbody').append(content)
+                          form.render("checkbox");
+                      })
+                      //修改
+                      $('.edit').click(function () {
+                          var id = $(this).parents("tr").find(".id").html();
+                          var username = $(this).parents("tr").find(".username").html();
+                          var status = $(this).parents("tr").find(".status").html();
+                          xadmin.open('修改','./admin-edit.html?id='+id+"&username="+decodeURI(username)+"&status="+status,600,400);
+                      })
+                      //状态
+                      $('.status').on('click',function () {
+                          var that = $(this)
+                          var id = $(this).parents("tr").find(".id").html()
+                          console.log(that.text())
+                          layer.confirm("确认要更改状态吗？",function (index) {
+                              if(that.text() == "启用"){
+                                  $.ajax({
+                                      url:"http://localhost:8080/user/update",
+                                      type:"post",
+                                      data:{"id":id,"status":1},
+                                      success:function (res) {
+                                          console.log(res)
+                                          if(res.status == 200){
+                                              that.text("禁用")
+                                              layer.msg("状态已修改！",{icon:1})
+                                          }
+
+                                      }
+                                  })
+                              }else{
+                                  $.ajax({
+                                      url:"http://localhost:8080/user/update",
+                                      type:"post",
+                                      data:{"id":id,"status":0},
+                                      success:function (res) {
+                                          if(res.status == 200){
+                                              that.text("启用")
+                                              layer.msg("状态已修改！",{icon:1})
+                                          }
+                                      }
+                                  })
+
+                              }
+                              layer.close(index)
+                          })
+                      })
+                  }
+
+              })
+
+          })
+          //查询全部数据
+          $.ajax({
+              url:"http://localhost:8080/user/findAll",
+              success:function (res) {
+                  console.log(res)
+                  $('tbody').empty()
+                  var content1 = ""
+                  res.data.forEach(function(value,key) {
+                      if(value.status == 1){
+                          content1 = "禁用"
+                      }else{
+                          content1 = "启用"
+                      }
+                      var content = "<tr>\n" +
+                          "                                  <td>\n" +
+                          "                                    <input class='item' type='checkbox' value='"+parseInt(key+1)+"' lay-skin='primary'>\n" +
+                          "                                  </td>\n" +
+                          "                                  <td>"+parseInt(key+1)+"</td>\n" +
+                          "                                    <td class='id' style='display: none;'>"+value.id+"</td>\n" +
+                          "                                    <td class='classId' style='display: none;'>"+value.classId+"</td>\n" +
+                          "                                    <td class='roleId' style='display: none;'>"+value.roleId+"</td>\n" +
+                          "                                    <td class='status' style='display: none;'>"+value.status+"</td>" +
+                          "                                  <td class='username'>"+value.username+"</td>\n" +
+                          "                                  <td>"+value.className+"</td>\n" +
+                          "                                  <td>"+value.depName+"</td>\n" +
+                          "                                  <td>"+value.roleName+"</td>\n" +
+                          "                                  <td class='td-status'>\n" +
+                          "                                    <span class='layui-btn layui-btn-normal layui-btn-mini status'>"+content1+"</span></td>\n" +
+                          "                                 <td><button  class='layui-btn edit' onclick='xadmin.open('修改','./admin-edit.html',600,400)'><i class='layui-icon'>&#xe642;</i>修改</button></td>" +
+                          "</tr>"
+                      console.log(1)
+                      $('tbody').append(content)
+                      form.render("checkbox");
+                  })
+                  //修改
+                  $('.edit').click(function () {
+                      var id = $(this).parents("tr").find(".id").html();
+                      var username = $(this).parents("tr").find(".username").html();
+                      var status = $(this).parents("tr").find(".status").html();
+                      xadmin.open('修改','./admin-edit.html?id='+id+"&username="+decodeURI(username)+"&status="+status,600,400);
+                  })
+                  //状态
+                  $('.status').on('click',function () {
+                      var that = $(this)
+                      var id = $(this).parents("tr").find(".id").html()
+                      console.log(that.text())
+                      layer.confirm("确认要更改状态吗？",function (index) {
+                          if(that.text() == "启用"){
+                              $.ajax({
+                                  url:"http://localhost:8080/user/update",
+                                  type:"post",
+                                  data:{"id":id,"status":1},
+                                  success:function (res) {
+                                      console.log(res)
+                                      if(res.status == 200){
+                                          that.text("禁用")
+                                          layer.msg("状态已修改！",{icon:1})
+                                      }
+
+                                  }
+                              })
+                          }else{
+                              $.ajax({
+                                  url:"http://localhost:8080/user/update",
+                                  type:"post",
+                                  data:{"id":id,"status":0},
+                                  success:function (res) {
+                                      if(res.status == 200){
+                                          that.text("启用")
+                                          layer.msg("状态已修改！",{icon:1})
+                                      }
+                                  }
+                              })
+
+                          }
+                          layer.close(index)
+                      })
+                  })
+              }
+          })
+          // 监听全选
+          form.on('checkbox(checkall)', function(data){
+
+              if(data.elem.checked){
+                  $('tbody input').prop('checked',true);
+              }else{
+                  $('tbody input').prop('checked',false);
+              }
+              form.render('checkbox');
+          });
+
+
+          })
+
+
+
+      function delAll (argument) {
+
+          var ids = [];
+          var database_id = [];
+          // 获取选中的id
+          $('tbody input').each(function(index, el) {
+              if($(this).prop('checked')){
+                  ids.push($(this).val())
+                  database_id.push(parseInt($(this).parents("tr").find(".id").html()))
+              }
+          });
+          console.log(ids,database_id)
+          layer.confirm('确认要删除吗？'+ids.toString(),function(index){
+              console.log(database_id)
+              //捉到所有被选中的，发异步进行删除
+              $.ajax({
+                  url:"http://localhost:8080/user/delete",//批量删除接口
+                  type:"post",
+                  data:{"ids":database_id},
+                  success:function (res) {
+                      if(res.status == 200){
+                          layer.msg('删除成功', {icon: 1});
+                          location.reload()
+                          $(".layui-form-checked").not('.header').parents('tr').remove();
+                      }
+
+                  }
+              })
+
+          });
+      }
+    </script>
+    <!--<script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>-->
+</html>

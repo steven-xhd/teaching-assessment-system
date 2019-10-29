@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>评教页面</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <style>
+
+        .problem{
+            font-size: 16px;
+        }
+        .group{
+            color: darkgreen;
+            font-size: 16px;
+        }
+        legend{
+            padding: 20px;
+        }
+        .item{
+            padding-left: 50px;
+        }
+        #submit{
+            margin-top: 10px;
+        }
+    </style>
+    <body>
+    <div class="layui-fluid">
+        <form id="myform" class="layui-form">
+           <!--后台获取数据-->
+
+        </form>
+    </div>
+    </body>
+    <script>
+      layui.use(['laydate','form','jquery'], function() {
+          var laydate = layui.laydate;
+          var form = layui.form;
+          var $ = layui.$;
+
+          $.ajax({
+              url:"http://localhost:8080/assess/findAssessAll",
+              success:function (res) {
+                  $('#myform').empty()
+                  //每一个问题的name
+                  var problemname = 0;
+                  res.data.forEach(function (value,key) {
+                      /*分组*/
+                      var content = "<fieldset class='group'>\n" +
+                          "                <legend>"+value.title+"</legend>\n" +
+                          "            </fieldset>"
+                      $("#myform").append(content);
+                      value.item.forEach(function (value1,key1) {
+                          /*问题*/
+                          problemname++;
+                          var content1 = " <div class='layui-input-block item'>\n" +
+                              "                    <div class='problem'><span class='number'>"+parseInt(key1+1)+".</span><span class='content'>"+value1.title+"</span></div>\n" +
+                              "               <div class='"+key+key1+""+"'></div> </div>";
+                          $('fieldset').eq(key).append(content1);
+                          console.log(content1)
+                          value1.option.forEach(function (value2,key2) {
+                              /*答案*/
+
+                                var content2 = "<input type='radio' name='"+problemname+"' value='"+value2.optionScore+"' title='"+value2.optionName+"'>"
+                              console.log(content2)
+                              $("."+key+key1).append(content2)
+                              form.render("radio")
+
+                          })
+
+                      })
+                     
+                  })
+                  var content3 = " <button id=\"submit\" type=\"button\" lay-submit lay-filter=\"myform\" class=\"layui-btn layui-btn-lg\">提 交</button>"
+                  $('#myform').append(content3)
+
+                  form.on('submit(myform)',function (data) {
+                      if($(':radio:checked').length != $('.item').length){
+                          layer.msg("存在未选项！",{icon:5})
+                      }else{
+                          var totalscore = 0;
+                          for(var i=1;i<=problemname;i++){
+                             totalscore += parseInt($(":radio[name='"+i+"']:checked").val())
+                          }
+                          //发送评教信息到后台保存
+                          $.ajax({
+                              url:"http://localhost:8080/assessResult/updateScore",
+                              data:{"score":totalscore},
+                              type:"post",
+                              success:function (res) {
+                                 if(res.status == 200){
+
+                                     $.ajax({
+                                         url:"http://localhost:8080/UnassessStudent/add",
+                                         success:function (data) {
+                                            if(data.status == 200){
+                                                layer.msg("评教已经完成",{icon:1})
+                                                xadmin.close()
+                                                xadmin.father_reload()
+                                            }
+                                         }
+                                     })
+                                 }else{
+                                     layer.msg("评教出错",{icon:5})
+                                 }
+                              }
+                          })
+                      }
+                  })
+              }
+          })
+
+      })
+    </script>
+</html>

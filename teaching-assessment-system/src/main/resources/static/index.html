@@ -1,0 +1,199 @@
+<!doctype html>
+<html class="x-admin-sm">
+<head>
+  <meta charset="UTF-8">
+  <title>后台登录-X-admin2.2</title>
+  <meta name="renderer" content="webkit|ie-comp|ie-stand">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <link rel="stylesheet" href="./css/font.css">
+  <link rel="stylesheet" href="./css/xadmin.css">
+  <!-- <link rel="stylesheet" href="./css/theme5.css"> -->
+  <script src="./lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./js/xadmin.js"></script>
+  <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+  <!--[if lt IE 9]>
+  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+  <script>
+    // 是否开启刷新记忆tab功能
+    // var is_remember = false;
+  </script>
+</head>
+<body class="index">
+<!-- 顶部开始 -->
+<div class="container">
+  <div class="logo">
+    <a href="./index.html">在线评教系统</a></div>
+  <div class="left_open">
+    <a><i title="展开左侧栏" class="iconfont">&#xe699;</i></a>
+  </div>
+  <ul class="layui-nav right" lay-filter="">
+    <li class="layui-nav-item">
+      <a href="javascript:;"><span id="username">admin</span></a>
+      <dl class="layui-nav-child">
+        <!-- 二级菜单 -->
+        <dd>
+          <a href="./login.html" id="exit">退出</a></dd>
+      </dl>
+    </li>
+    <li class="layui-nav-item to-index">
+      <a href="javasrcipt:" onclick="xadmin.add_tab('我的桌面','welcome.html')">前台首页</a></li>
+  </ul>
+</div>
+<!-- 顶部结束 -->
+<!-- 中部开始 -->
+<!-- 左侧菜单开始 -->
+<div class="left-nav">
+  <div id="side-nav">
+    <ul id="nav">
+      <li>
+        <a href="javascript:;">
+          <i class="iconfont left-nav-li" lay-tips="系统管理">&#xe6b8;</i>
+          <cite>系统管理</cite>
+          <i class="iconfont nav_right">&#xe697;</i></a>
+        <ul class="sub-menu">
+          <li>
+            <a onclick="xadmin.add_tab('学生管理','admin-list.html')">
+              <i class="iconfont">&#xe6a7;</i>
+              <cite>学生管理</cite></a>
+          </li>
+          <li>
+            <a onclick="xadmin.add_tab('教师管理','teacher-list.html')">
+              <i class="iconfont">&#xe6a7;</i>
+              <cite>教师管理</cite></a>
+          </li>
+          <li>
+            <a onclick="xadmin.add_tab('角色管理','member-list.html')">
+              <i class="iconfont">&#xe6a7;</i>
+              <cite>角色管理</cite></a>
+          </li>
+          <li>
+            <a onclick="xadmin.add_tab('班级管理','class-list.html')">
+              <i class="iconfont">&#xe6a7;</i>
+              <cite>班级管理</cite></a>
+          </li>
+          <li>
+            <a onclick="xadmin.add_tab('课程管理','lesson-list.html')">
+              <i class="iconfont">&#xe6a7;</i>
+              <cite>课程管理</cite></a>
+          </li>
+          <li>
+            <a onclick="xadmin.add_tab('批次管理','batch-list.html')">
+              <i class="iconfont">&#xe6a7;</i>
+              <cite>批次管理</cite></a>
+          </li>
+          <li>
+            <a onclick="xadmin.add_tab('授课管理','givelesson-list.html')">
+              <i class="iconfont">&#xe6a7;</i>
+              <cite>授课管理</cite></a>
+          </li>
+          <li>
+            <a onclick="xadmin.add_tab('院系管理','college-list.html')">
+              <i class="iconfont">&#xe6a7;</i>
+              <cite>院系管理</cite></a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="javascript:;">
+          <i class="iconfont left-nav-li" lay-tips="评教结果">&#xe723;</i>
+          <cite>评教结果</cite>
+          <i class="iconfont nav_right">&#xe697;</i></a>
+        <ul class="sub-menu">
+          <li>
+            <a onclick="xadmin.add_tab('成绩查看','grade-list.html')">
+              <i class="iconfont">&#xe6a7;</i>
+              <cite>成绩查看</cite></a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="javascript:;">
+          <i class="iconfont left-nav-li" lay-tips="学生评教">&#xe723;</i>
+          <cite>学生评教</cite>
+          <i class="iconfont nav_right">&#xe697;</i></a>
+        <ul class="sub-menu">
+          <li>
+            <a onclick="xadmin.add_tab('评教入口','student-assess.html')">
+              <i class="iconfont">&#xe6a7;</i>
+              <cite>评教入口</cite></a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+<!-- <div class="x-slide_left"></div> -->
+<!-- 左侧菜单结束 -->
+<!-- 右侧主体开始 -->
+<div class="page-content">
+  <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+    <ul id="tab" class="layui-tab-title">
+      <li class="home">
+        <i class="layui-icon">&#xe68e;</i>我的桌面</li></ul>
+    <div class="layui-unselect layui-form-select layui-form-selected" id="tab_right">
+      <dl>
+        <dd data-type="this">关闭当前</dd>
+        <dd data-type="other">关闭其它</dd>
+        <dd data-type="all">关闭全部</dd></dl>
+    </div>
+    <div class="layui-tab-content">
+      <div class="layui-tab-item layui-show">
+        <iframe src='./welcome.html' frameborder="0" scrolling="yes" class="x-iframe"></iframe>
+      </div>
+    </div>
+    <div id="tab_show"></div>
+  </div>
+</div>
+<div class="page-content-bg"></div>
+<style id="theme_style"></style>
+<!-- 右侧主体结束 -->
+<!-- 中部结束 -->
+<script>
+  var username = getCookie("username")
+  console.log(username)
+  if(username == null||username == ""){
+    console.log("内容是空")
+    location.href = "./login.html"
+  }
+
+  layui.use(['layer','jquery'],function () {
+    var layer = layui.layer
+    var $ = layui.jquery
+
+    //设置username
+    $('#username').text(username)
+    //根据URL获取相应的用户角色id，判断用户权限
+    var roleId = document.URL.split('=')[1]
+    if(roleId == 1){
+      $('#nav>li:not(:first)').css("display","none")
+    }else if(roleId == 2){
+      $('#nav>li:not(:last)').css("display","none")
+    }else{
+      $('#nav>li:not(:eq(1))').css("display","none")
+    }
+
+    //点击退出
+    $('#exit').click(function () {
+      document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      location.href = "./login.html"
+      return false;
+    })
+  })
+  function getCookie(cname)
+  {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++)
+    {
+      var c = ca[i].trim();
+      if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+    }
+    return "";
+  }
+</script>
+</body>
+</html>

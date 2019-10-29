@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tces.mapper.TbLessonInfoMapperCustom">
+    <!--结果集映射-->
+    <resultMap id="giveLessonResult" type="giveLessons">
+        <id column="id" property="id"/>
+        <result column="batchId" property="batchId"/>
+        <result column="batchName" property="batchName"/>
+        <result column="classId" property="classId"/>
+        <result column="className" property="className"/>
+        <result column="lessonId" property="lessonId"/>
+        <result column="lessonName" property="lessonName"/>
+        <result column="userId" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="depId" property="depId"/>
+        <result column="depName" property="depName"/>
+    </resultMap>
+
+    <select id="findTeacherGiveLesson" resultMap="giveLessonResult" parameterType="Integer">
+        SELECT
+        tb_lesson_info.id as id,
+        tb_batch.id as batchId,
+        tb_batch.batch_name as batchName,
+        tb_classinfo.id as classId,
+        tb_classinfo.class_name as className,
+        tb_lesson.id as lessonId,
+        tb_lesson.lesson_name as lessonName,
+        tb_user.id as userId,
+        tb_user.username as username,
+        tb_department.id as depId,
+        tb_department.dep_name as depName
+        FROM
+        tb_lesson_info
+        JOIN tb_batch ON tb_lesson_info.bath_Id = tb_batch.id
+        JOIN tb_classinfo ON tb_lesson_info.class_id=tb_classinfo.id
+        join tb_lesson on tb_lesson_info.lesson_id=tb_lesson.id
+        join tb_user on tb_lesson_info.user_id= tb_user.id
+        JOIN tb_department ON tb_user.dep_id = tb_department.id
+        <where>
+            <if test="classId!=null">
+                and tb_classinfo.id = #{classId}
+            </if>
+            <if test="lessonIds!=null">
+                and tb_lesson_info.lesson_id not in
+                <foreach item="lessonId" collection="lessonIds" separator="," open="(" close=")">
+                    #{lessonId}
+                </foreach>
+            </if>
+            and tb_batch.batch_status=1
+        </where>
+        ORDER BY tb_lesson_info.id
+    </select>
+</mapper>

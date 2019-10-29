@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>授课管理</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
+                            <button class="layui-btn" onclick="xadmin.open('添加','./givelesson-add.html',600,400)"><i class="layui-icon"></i>添加</button>
+                        </div>
+                        <div class="layui-card-body ">
+                            <table class="layui-table layui-form">
+                              <thead>
+                                <tr>
+                                  <th>
+                                    <input lay-filter="checkall" type="checkbox" name=""  lay-skin="primary">
+                                  </th>
+                                  <th>序号</th>
+                                    <th class="id" style="display: none;">id</th>
+                                  <th>批次</th>
+                                  <th>班级</th>
+                                  <th>课程</th>
+                                  <th>授课教师</th>
+                                    <th>院系</th>
+                                    <th>操作</th>
+                                </tr>
+                              
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>
+                                    <input class="item" type="checkbox" value="1" lay-skin="primary">
+                                  </td>
+                                  <td>1</td>
+                                    <td class="id" style="display: none;">1</td>
+                                  <td>第一学期</td>
+                                  <td>1690011</td>
+                                  <td>Java程序设计</td>
+                                  <td>张老师</td>
+                                    <td>软件学院</td>
+                                    <td><button  class="layui-btn edit" onclick="xadmin.open('修改','./givelesson-edit.html',600,400)"><i class="layui-icon">&#xe642;</i>修改</button></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                        </div>
+                       <!-- <div class="layui-card-body ">
+                            <div class="page">
+                                <div>
+                                  <a class="prev" href="">&lt;&lt;</a>
+                                  <a class="num" href="">1</a>
+                                  <span class="current">2</span>
+                                  <a class="num" href="">3</a>
+                                  <a class="num" href="">489</a>
+                                  <a class="next" href="">&gt;&gt;</a>
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </body>
+    <script>
+      layui.use(['laydate','form','jquery','layer'], function(){
+        var laydate = layui.laydate;
+        var form = layui.form;
+        var layer = layui.layer
+        var $ =layui.$
+
+          //查询全部数据
+          $.ajax({
+              url:"http://localhost:8080/lessonInfo/findTeacherGiveLesson",
+              success:function (res) {
+                  console.log(res)
+                  $('tbody').empty()
+                  res.data.forEach(function(value,key) {
+                      console.log(key)
+                      var content = "<tr>\n" +
+                          "                                  <td>\n" +
+                          "                                    <input class='item' type='checkbox' value='"+parseInt(key+1)+"' lay-skin='primary'>\n" +
+                          "                                  </td>\n" +
+                          "                                  <td>"+parseInt(key+1)+"</td>\n" +
+                          "                                    <td class='id' style='display: none;'>"+value.id+"</td>\n" +
+                          "                                  <td>"+value.batchName+"</td>\n" +
+                          "                                  <td>"+value.className+"</td>\n" +
+                          "                                  <td>"+value.lessonName+"</td>\n" +
+                          "                                  <td>"+value.username+"</td>\n" +
+                          "                                    <td>"+value.depName+"</td>\n" +
+                          "                                    <td><button  class='layui-btn edit' onclick='xadmin.open('修改','./college-edit.html',600,400)'><i class='layui-icon'>&#xe642;</i>修改</button></td>\n" +
+                          "                                </tr>"
+                      $('tbody').append(content)
+                      form.render("checkbox");
+
+                  })
+                 //修改
+                  $('.edit').click(function () {
+                      var id = $(this).parents("tr").find(".id").html();
+                      xadmin.open('修改','./givelesson-edit.html?id='+id);
+                  })
+              }
+          })
+          // 监听全选
+          form.on('checkbox(checkall)', function(data){
+
+              if(data.elem.checked){
+                  $('tbody input').prop('checked',true);
+              }else{
+                  $('tbody input').prop('checked',false);
+              }
+              form.render('checkbox');
+          });
+          //状态
+          $('.status').click(function () {
+              var that = $(this)
+              var id = $(this).parents("tr").find(".id").html()
+              console.log(id)
+              layer.confirm("确认要更改状态吗？",function (index) {
+
+                  if(that.text() == "启用"){
+                      $.ajax({
+                          url:"",
+                          data:{"id":id,"roleStatus":1},
+                          success:function (res) {
+                              if(res.status == 200){
+                                  that.text("禁用")
+                                  layer.msg("状态已修改！",{icon:1})
+                              }
+
+                          }
+                      })
+                  }else{
+                      $.ajax({
+                          url:"",
+                          data:{"id":id,"roleStatus":0},
+                          success:function (res) {
+                              if(res.status == 200){
+                                  that.text("启用")
+                                  layer.msg("状态已修改！",{icon:1})
+                              }
+                          }
+                      })
+
+                  }
+                  layer.close(index)
+              })
+          })
+
+          })
+
+
+      function delAll (argument) {
+
+          var ids = [];
+          var database_id = [];
+          // 获取选中的id
+          $('tbody input').each(function(index, el) {
+              if($(this).prop('checked')){
+                  ids.push($(this).val())
+                  database_id.push(parseInt($(this).parents("tr").find(".id").html()))
+              }
+          });
+          console.log(ids,database_id)
+          layer.confirm('确认要删除吗？'+ids.toString(),function(index){
+              console.log(database_id)
+              //捉到所有被选中的，发异步进行删除
+              $.ajax({
+                  url:"http://localhost:8080/lessonInfo/delete",//批量删除接口
+                  type:"post",
+                  data:{"ids":database_id},
+                  success:function (res) {
+                      if(res.status == 200){
+                          layer.msg('删除成功', {icon: 1});
+                          location.reload()
+                          $(".layui-form-checked").not('.header').parents('tr').remove();
+                      }
+
+                  }
+              })
+
+          });
+      }
+    </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+</html>

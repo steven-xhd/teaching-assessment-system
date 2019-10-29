@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>学生评教</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body layui-table-body layui-table-main">
+                            <table id="mytable" class="layui-table layui-form">
+                                <thead>
+                                  <tr>
+                                    <th>序号</th>
+                                    <th class="id" style="display: none;">ID</th>
+                                      <th class="batchId" style="display: none;">ID</th>
+                                      <th class="lessonId" style="display: none;">ID</th>
+                                      <th class="userId" style="display: none;">ID</th>
+                                    <th>批次</th>
+                                    <th>班级</th>
+                                      <th>课程</th>
+                                      <th>授课教师</th>
+                                      <th>所属院系</th>
+                                      <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                               <!--加载后台评教数据-->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="layui-card-body ">
+                           <!-- <div class="page">
+                                <div>
+                                  <a class="prev" href="">&lt;&lt;</a>
+                                  <a class="num" href="">1</a>
+                                  <span class="current">2</span>
+                                  <a class="num" href="">3</a>
+                                  <a class="num" href="">489</a>
+                                  <a class="next" href="">&gt;&gt;</a>
+                                </div>
+                            </div>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+      layui.use(['laydate','form','jquery'], function(){
+        var laydate = layui.laydate;
+        var  form = layui.form;
+        var $ = layui.$;
+
+        //获取classId
+        var classId = getCookie("classId")
+          console.log(classId)
+        //加载学生对应所有评教信息
+          $.ajax({
+              url:"http://localhost:8080/lessonInfo/findLessonInfoByClassId",
+              data:{"classId":classId},
+              success:function (res) {
+                  res.data.forEach(function (value,key) {
+                      var content = " <tr>\n" +
+                          "                                    <td>"+parseInt(key+1)+"</td>\n" +
+                          "                                    <td class=\"id\" style=\"display: none;\">"+value.id+"</td>\n" +
+                          "                                    <td class=\"batchId\" style=\"display: none;\">"+value.batchId+"</td>\n" +
+                          "                                    <td class=\"lessonId\" style=\"display: none;\">"+value.lessonId+"</td>\n" +
+                          "                                    <td class=\"userId\" style=\"display: none;\">"+value.userId+"</td>\n" +
+                          "                                    <td>"+value.batchName+"</td>\n" +
+                          "                                    <td>"+value.className+"</td>\n" +
+                          "                                    <td>"+value.lessonName+"</td>\n" +
+                          "                                    <td>"+value.username+"</td>\n" +
+                          "                                    <td>"+value.depName+"</td>\n" +
+                          "                                    <td class=\"td-manage\">\n" +
+                          "                                        <a href=\"javascript:\"onclick=\"xadmin.add_tab('正在评教','assess-page.html')\" class=\"layui-btn layui-btn-normal layui-btn-mini status\">评教</a></td>\n" +
+                          "                                </tr>";
+                      $('tbody').append(content)
+                  })
+                  $('.status').click(function () {
+                      var batchId = $(this).parents("tr").find(".batchId").html();
+                      var lessonId = $(this).parents("tr").find(".lessonId").html();
+                      var userId = $(this).parents("tr").find(".userId").html();
+                      document.cookie = "batchId="+batchId
+                      document.cookie = "lessonId="+lessonId
+                      document.cookie = "userId="+userId
+                      xadmin.open('学生评教','./assess-page.html',false)
+                  })
+              }
+          })
+
+      })
+      function getCookie(cname)
+      {
+          var name = cname + "=";
+          var ca = document.cookie.split(';');
+          for(var i=0; i<ca.length; i++)
+          {
+              var c = ca[i].trim();
+              if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+          }
+          return "";
+      }
+ </script>
+</html>
